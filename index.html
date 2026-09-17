@@ -1,0 +1,95 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robux Sender</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="topbar">
+        <div class="logo">Robux Sender</div>
+
+        <div class="balance">
+            <span id="balance">1,000,000</span>
+            <span>Fake Robux</span>
+        </div>
+    </header>
+
+    <main>
+        <div class="sender-card">
+
+            <div class="header">
+                <h1>Send Robux</h1>
+                <p>Send a fictional amount to a simulated user.</p>
+            </div>
+
+            <label for="username">Username</label>
+
+            <div class="input-row">
+                <input
+                    id="username"
+                    type="text"
+                    placeholder="Enter username"
+                    autocomplete="off"
+                >
+
+                <button id="findButton">Find</button>
+            </div>
+
+            <div id="userBox" class="user-box hidden">
+                <div class="avatar"></div>
+
+                <div>
+                    <strong id="foundUsername"></strong>
+                    <span>User found</span>
+                </div>
+            </div>
+
+            <label for="amount">Amount</label>
+
+            <div class="amount-wrapper">
+                <input
+                    id="amount"
+                    type="number"
+                    min="1"
+                    placeholder="Enter amount"
+                >
+
+                <span>Fake Robux</span>
+            </div>
+
+            <button id="sendButton" class="send-button" disabled>
+                Send Robux
+            </button>
+
+            <p class="notice">
+                Fictional simulator. No real Robux are transferred.
+            </p>
+
+        </div>
+    </main>
+
+    <div id="processing" class="overlay hidden">
+        <div class="modal">
+            <div class="spinner"></div>
+            <h2>Processing</h2>
+            <p>Simulating the transfer...</p>
+        </div>
+    </div>
+
+    <div id="success" class="overlay hidden">
+        <div class="modal">
+            <div class="success">✓</div>
+            <h2>Transfer complete</h2>
+            <p id="successText"></p>
+            <button id="closeButton">Close</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+```
