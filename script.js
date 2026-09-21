@@ -77,6 +77,21 @@ function showStep(id) {
   if (target) {
     target.classList.add("active");
   }
+
+}
+
+
+/* =========================================
+   DEBUG MESSAGE
+========================================= */
+
+function showDebug(message) {
+
+  console.log(
+    "[Roblox Search]",
+    message
+  );
+
 }
 
 
@@ -97,11 +112,9 @@ usernameInput.addEventListener(
 
     results.innerHTML = "";
 
-    error.style.display =
-      "none";
+    error.style.display = "none";
 
-    continueButton.disabled =
-      true;
+    continueButton.disabled = true;
 
     userId = "";
     username = "";
@@ -110,10 +123,10 @@ usernameInput.addEventListener(
 
     if (keyword.length === 0) {
 
-      searchStatus.textContent =
-        "";
+      searchStatus.textContent = "";
 
       return;
+
     }
 
 
@@ -123,6 +136,7 @@ usernameInput.addEventListener(
         "Type at least 2 characters.";
 
       return;
+
     }
 
 
@@ -130,7 +144,7 @@ usernameInput.addEventListener(
       "Searching Roblox...";
 
 
-    const requestId =
+    const currentRequest =
       searchRequestId;
 
 
@@ -140,11 +154,11 @@ usernameInput.addEventListener(
 
           searchRoblox(
             keyword,
-            requestId
+            currentRequest
           );
 
         },
-        350
+        400
       );
 
   }
@@ -152,23 +166,37 @@ usernameInput.addEventListener(
 
 
 /* =========================================
-   SEARCH ROBLOX
+   ROBLOX SEARCH
 ========================================= */
 
 async function searchRoblox(
   keyword,
-  requestId
+  currentRequest
 ) {
+
+  showDebug(
+    "Starting search for: " +
+    keyword
+  );
+
 
   try {
 
     /*
-      Exact username lookup
+    ========================================
+    1. EXACT USERNAME SEARCH
+    ========================================
     */
 
     let exactUsers = [];
 
+
     try {
+
+      showDebug(
+        "Trying exact username endpoint..."
+      );
+
 
       const exactResponse =
         await fetch(
@@ -185,20 +213,37 @@ async function searchRoblox(
             },
 
             body: JSON.stringify({
+
               usernames: [
                 keyword
               ],
+
               excludeBannedUsers:
                 false
+
             })
           }
         );
 
 
-      if (exactResponse.ok) {
+      showDebug(
+        "Exact endpoint status: " +
+        exactResponse.status
+      );
+
+
+      if (
+        exactResponse.ok
+      ) {
 
         const exactData =
           await exactResponse.json();
+
+
+        console.log(
+          "[Roblox Search] Exact response:",
+          exactData
+        );
 
 
         if (
@@ -211,10 +256,19 @@ async function searchRoblox(
           exactUsers =
             exactData.data.map(
               user => ({
-                id: user.id,
-                name: user.name,
+
+                id:
+                  user.id,
+
+                name:
+                  user.name,
+
                 displayName:
-                  user.displayName
+                  user.displayName,
+
+                requestedUsername:
+                  user.requestedUsername
+
               })
             );
 
@@ -224,8 +278,8 @@ async function searchRoblox(
 
     } catch (exactError) {
 
-      console.log(
-        "Exact Roblox search unavailable:",
+      console.error(
+        "[Roblox Search] Exact endpoint error:",
         exactError
       );
 
@@ -233,60 +287,144 @@ async function searchRoblox(
 
 
     /*
-      Normal keyword search
+    ========================================
+    2. NORMAL SEARCH
+    ========================================
     */
 
-    const searchUrl =
-      "https://users.roblox.com/v1/users/search" +
-      "?keyword=" +
-      encodeURIComponent(keyword) +
-      "&limit=10";
+    let normalUsers = [];
 
 
-    const searchResponse =
-      await fetch(searchUrl);
+    try {
+
+      showDebug(
+        "Trying normal search endpoint..."
+      );
 
 
-    if (!searchResponse.ok) {
+      const normalResponse =
+        await fetch(
+          "https://users.roblox.com/v1/users/search" +
+          "?keyword=" +
+          encodeURIComponent(keyword) +
+          "&limit=10"
+        );
 
-      throw new Error(
-        "Roblox search failed: " +
-        searchResponse.status
+
+      showDebug(
+        "Normal endpoint status: " +
+        normalResponse.status
+      );
+
+
+      if (
+        normalResponse.ok
+      ) {
+
+        const normalData =
+          await normalResponse.json();
+
+
+        console.log(
+          "[Roblox Search] Normal response:",
+          normalData
+        );
+
+
+        if (
+          normalData.data &&
+          Array.isArray(
+            normalData.data
+          )
+        ) {
+
+          normalUsers =
+            normalData.data.map(
+              user => ({
+
+                id:
+                  user.id,
+
+                name:
+                  user.name,
+
+                displayName:
+                  user.displayName
+
+              })
+            );
+
+        }
+
+      }
+
+    } catch (normalError) {
+
+      console.error(
+        "[Roblox Search] Normal endpoint error:",
+        normalError
       );
 
     }
 
 
-    const searchData =
-      await searchResponse.json();
-
+    /*
+    ========================================
+    CHECK REQUEST
+    ========================================
+    */
 
     if (
-      requestId !==
+      currentRequest !==
       searchRequestId
     ) {
+
+      showDebug(
+        "Ignoring old search request."
+      );
+
       return;
+
     }
 
 
-    let users = [];
-
-
     /*
-      Exact result first
+    ========================================
+    COMBINE RESULTS
+    ========================================
     */
+
+    const combinedUsers = [];
+    const seenIds = new Set();
+
 
     exactUsers.forEach(
       user => {
 
         if (
-          !users.some(
-            existing =>
-              existing.id === user.id
-          )
+          !seenIds.has(user.id)
         ) {
 
-          users.push(user);
+          seenIds.add(user.id);
+
+          combinedUsers.push(user);
+
+        }
+
+      }
+    );
+
+
+    normalUsers.forEach(
+      user => {
+
+        if (
+          !seenIds.has(user.id)
+        ) {
+
+          seenIds.add(user.id);
+
+          combinedUsers.push(user);
 
         }
 
@@ -295,68 +433,75 @@ async function searchRoblox(
 
 
     /*
-      Then normal search results
+    ========================================
+    NO RESULTS
+    ========================================
     */
 
     if (
-      searchData.data &&
-      Array.isArray(
-        searchData.data
-      )
+      combinedUsers.length === 0
     ) {
 
-      searchData.data.forEach(
-        user => {
-
-          if (
-            !users.some(
-              existing =>
-                existing.id === user.id
-            )
-          ) {
-
-            users.push({
-              id: user.id,
-              name: user.name,
-              displayName:
-                user.displayName
-            });
-
-          }
-
-        }
+      showDebug(
+        "Roblox returned zero users."
       );
+
+
+      searchStatus.textContent =
+        "No Roblox users found.";
+
+
+      error.innerHTML = `
+        <div>
+          Roblox returned no matching accounts.
+        </div>
+
+        <div
+          style="
+            margin-top:6px;
+            font-size:11px;
+            color:#71717a;
+          "
+        >
+          Open the browser console with F12
+          for search diagnostics.
+        </div>
+      `;
+
+
+      error.style.display =
+        "block";
+
+
+      return;
 
     }
 
 
     /*
-      Limit to 10
+    ========================================
+    LIMIT
+    ========================================
     */
 
-    users =
-      users.slice(0, 10);
+    const users =
+      combinedUsers.slice(0, 10);
 
 
-    results.innerHTML =
-      "";
-
-
-    if (users.length === 0) {
-
-      searchStatus.textContent =
-        "No Roblox users found.";
-
-      return;
-    }
-
+    /*
+    ========================================
+    STATUS
+    ========================================
+    */
 
     searchStatus.textContent =
       "Select a Roblox user:";
 
 
     /*
-      Load avatars
+    ========================================
+    AVATARS
+    ========================================
     */
 
     const ids =
@@ -365,60 +510,87 @@ async function searchRoblox(
         .join(",");
 
 
-    const avatarResponse =
-      await fetch(
-        "https://thumbnails.roblox.com/v1/users/avatar-headshot" +
-        "?userIds=" +
-        encodeURIComponent(ids) +
-        "&size=150x150" +
-        "&format=Png" +
-        "&isCircular=false"
-      );
-
-
     let avatarMap = {};
 
 
-    if (avatarResponse.ok) {
+    try {
 
-      const avatarData =
-        await avatarResponse.json();
+      showDebug(
+        "Loading avatars..."
+      );
+
+
+      const avatarResponse =
+        await fetch(
+          "https://thumbnails.roblox.com/v1/users/avatar-headshot" +
+          "?userIds=" +
+          encodeURIComponent(ids) +
+          "&size=150x150" +
+          "&format=Png" +
+          "&isCircular=false"
+        );
+
+
+      showDebug(
+        "Avatar endpoint status: " +
+        avatarResponse.status
+      );
 
 
       if (
-        avatarData.data &&
-        Array.isArray(
-          avatarData.data
-        )
+        avatarResponse.ok
       ) {
 
-        avatarData.data.forEach(
-          item => {
+        const avatarData =
+          await avatarResponse.json();
 
-            avatarMap[
-              item.targetId
-            ] =
-              item.imageUrl;
 
-          }
+        console.log(
+          "[Roblox Search] Avatar response:",
+          avatarData
         );
+
+
+        if (
+          avatarData.data &&
+          Array.isArray(
+            avatarData.data
+          )
+        ) {
+
+          avatarData.data.forEach(
+            item => {
+
+              avatarMap[
+                item.targetId
+              ] =
+                item.imageUrl;
+
+            }
+          );
+
+        }
 
       }
 
-    }
+    } catch (avatarError) {
 
+      console.error(
+        "[Roblox Search] Avatar error:",
+        avatarError
+      );
 
-    if (
-      requestId !==
-      searchRequestId
-    ) {
-      return;
     }
 
 
     /*
-      Create result cards
+    ========================================
+    CREATE RESULT CARDS
+    ========================================
     */
+
+    results.innerHTML = "";
+
 
     users.forEach(
       user => {
@@ -431,19 +603,29 @@ async function searchRoblox(
       }
     );
 
+
+    showDebug(
+      "Displayed " +
+      users.length +
+      " Roblox result(s)."
+    );
+
+
   } catch (err) {
 
     console.error(
-      "Roblox search error:",
+      "[Roblox Search] FATAL ERROR:",
       err
     );
 
 
     if (
-      requestId !==
+      currentRequest !==
       searchRequestId
     ) {
+
       return;
+
     }
 
 
@@ -451,8 +633,22 @@ async function searchRoblox(
       "";
 
 
-    error.textContent =
-      "Roblox search is currently unavailable.";
+    error.innerHTML = `
+      <div>
+        Roblox search could not be completed.
+      </div>
+
+      <div
+        style="
+          margin-top:6px;
+          font-size:11px;
+          color:#71717a;
+        "
+      >
+        Press F12 and open Console
+        to see the exact error.
+      </div>
+    `;
 
 
     error.style.display =
@@ -464,7 +660,7 @@ async function searchRoblox(
 
 
 /* =========================================
-   RESULT CARD
+   CREATE RESULT CARD
 ========================================= */
 
 function createResultCard(
@@ -485,12 +681,36 @@ function createResultCard(
 
 
   card.innerHTML = `
+
     <div class="result-avatar">
-      <img
-        src="${escapeAttribute(avatar)}"
-        alt=""
-      >
+
+      ${
+        avatar
+          ? `
+            <img
+              src="${escapeAttribute(avatar)}"
+              alt=""
+            >
+          `
+          : `
+            <div
+              style="
+                width:100%;
+                height:100%;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                color:#71717a;
+                font-size:12px;
+              "
+            >
+              ?
+            </div>
+          `
+      }
+
     </div>
+
 
     <div class="result-info">
 
@@ -503,6 +723,7 @@ function createResultCard(
       </div>
 
     </div>
+
   `;
 
 
@@ -519,39 +740,9 @@ function createResultCard(
   );
 
 
-  results.appendChild(card);
-
-}
-
-
-/* =========================================
-   SAFE HTML
-========================================= */
-
-function escapeHtml(text) {
-
-  const div =
-    document.createElement("div");
-
-  div.textContent =
-    String(text ?? "");
-
-  return div.innerHTML;
-
-}
-
-
-/* =========================================
-   SAFE ATTRIBUTE
-========================================= */
-
-function escapeAttribute(text) {
-
-  return String(text ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  results.appendChild(
+    card
+  );
 
 }
 
@@ -572,7 +763,7 @@ function selectUser(
     user.name;
 
   avatarUrl =
-    avatar;
+    avatar || "";
 
 
   selectedUsername.textContent =
@@ -611,6 +802,64 @@ function selectUser(
     "Selected: " +
     username;
 
+
+  error.style.display =
+    "none";
+
+}
+
+
+/* =========================================
+   ESCAPE HTML
+========================================= */
+
+function escapeHtml(
+  text
+) {
+
+  const div =
+    document.createElement(
+      "div"
+    );
+
+
+  div.textContent =
+    String(text ?? "");
+
+
+  return div.innerHTML;
+
+}
+
+
+/* =========================================
+   ESCAPE ATTRIBUTE
+========================================= */
+
+function escapeAttribute(
+  text
+) {
+
+  return String(
+    text ?? ""
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    );
+
 }
 
 
@@ -626,7 +875,10 @@ continueButton.addEventListener(
       return;
     }
 
-    showStep("step2");
+
+    showStep(
+      "step2"
+    );
 
   }
 );
@@ -642,7 +894,14 @@ document
     "click",
     function () {
 
-      showStep("step3");
+      if (!userId) {
+        return;
+      }
+
+
+      showStep(
+        "step3"
+      );
 
     }
   );
@@ -654,7 +913,9 @@ document
     "click",
     function () {
 
-      showStep("step1");
+      showStep(
+        "step1"
+      );
 
     }
   );
@@ -693,8 +954,11 @@ amountOptions.forEach(
 
         selectedAmount.textContent =
           "Selected: R$ " +
-          Number(amount)
-            .toLocaleString("en-US");
+          Number(
+            amount
+          ).toLocaleString(
+            "en-US"
+          );
 
 
         reviewButton.disabled =
@@ -723,19 +987,27 @@ reviewButton.addEventListener(
     reviewUsername.textContent =
       username;
 
+
     reviewRecipient.textContent =
       username;
 
+
     reviewAmount.textContent =
       "R$ " +
-      Number(amount)
-        .toLocaleString("en-US");
+      Number(
+        amount
+      ).toLocaleString(
+        "en-US"
+      );
+
 
     reviewAvatar.src =
       avatarUrl;
 
 
-    showStep("step4");
+    showStep(
+      "step4"
+    );
 
   }
 );
@@ -751,7 +1023,9 @@ document
     "click",
     function () {
 
-      showStep("step2");
+      showStep(
+        "step2"
+      );
 
     }
   );
@@ -763,7 +1037,9 @@ document
     "click",
     function () {
 
-      showStep("step3");
+      showStep(
+        "step3"
+      );
 
     }
   );
@@ -789,7 +1065,9 @@ document
       }
 
 
-      showStep("step5");
+      showStep(
+        "step5"
+      );
 
 
       setTimeout(
@@ -797,14 +1075,19 @@ document
 
           successText.textContent =
             "The fictional transfer of R$ " +
-            Number(amount)
-              .toLocaleString("en-US") +
+            Number(
+              amount
+            ).toLocaleString(
+              "en-US"
+            ) +
             " to " +
             username +
             " has been completed.";
 
 
-          showStep("step6");
+          showStep(
+            "step6"
+          );
 
         },
         3000
@@ -853,12 +1136,14 @@ document
       selectedUsername.textContent =
         "Username";
 
+
       selectedAvatar.src =
         "";
 
 
       amountUsername.textContent =
         "Username";
+
 
       amountAvatar.src =
         "";
@@ -867,11 +1152,14 @@ document
       reviewUsername.textContent =
         "Username";
 
+
       reviewRecipient.textContent =
         "";
 
+
       reviewAmount.textContent =
         "";
+
 
       reviewAvatar.src =
         "";
@@ -896,7 +1184,9 @@ document
         true;
 
 
-      showStep("step1");
+      showStep(
+        "step1"
+      );
 
     }
   );
