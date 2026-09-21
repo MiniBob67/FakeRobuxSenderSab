@@ -13,7 +13,7 @@ body {
 
 .topbar {
   height: 64px;
-  background: #111111;
+  background: #111;
   display: flex;
   align-items: center;
   padding: 0 32px;
@@ -40,7 +40,7 @@ body {
   border: 1px solid #e1e1e1;
   border-radius: 14px;
   padding: 34px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, .06);
 }
 
 .step {
@@ -124,7 +124,7 @@ input:focus {
 }
 
 
-/* USER CARD */
+/* USER */
 
 .user-card {
   display: flex;
@@ -172,58 +172,26 @@ input:focus {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 13px;
 }
 
 
-/* AVATAR */
-
-.avatar,
-.small-avatar,
-.review-avatar {
-  background: #e8e8e8;
-  position: relative;
-  overflow: hidden;
-}
+/* REAL AVATAR */
 
 .avatar {
   width: 58px;
   height: 58px;
   border-radius: 10px;
+  overflow: hidden;
+  background: #e8e8e8;
+  flex-shrink: 0;
 }
 
-.small-avatar {
-  width: 45px;
-  height: 45px;
-  border-radius: 8px;
-}
-
-.review-avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 9px;
-}
-
-.avatar-head {
-  position: absolute;
-  width: 25px;
-  height: 25px;
-  background: #c9956c;
-  border-radius: 50%;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.avatar-body {
-  position: absolute;
-  width: 36px;
-  height: 25px;
-  background: #333;
-  border-radius: 8px 8px 0 0;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
+.avatar img,
+.small-avatar img,
+.review-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 
@@ -237,6 +205,15 @@ input:focus {
   border-bottom: 1px solid #ededed;
   padding-bottom: 18px;
   margin-bottom: 22px;
+}
+
+.small-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #e8e8e8;
+  flex-shrink: 0;
 }
 
 .amount-grid {
@@ -288,6 +265,15 @@ input:focus {
 
 /* REVIEW */
 
+.review-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 9px;
+  overflow: hidden;
+  background: #e8e8e8;
+  flex-shrink: 0;
+}
+
 .review {
   border: 1px solid #e2e2e2;
   border-radius: 10px;
@@ -313,7 +299,67 @@ input:focus {
 
 .review-value {
   font-weight: 700;
-  text-align: right;
+}
+
+
+/* SENDING */
+
+.sending {
+  text-align: center;
+  padding: 25px 0;
+}
+
+.sending h2 {
+  font-size: 25px;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+.sending p {
+  color: #707070;
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
+.spinner {
+  width: 52px;
+  height: 52px;
+  border: 5px solid #e5e5e5;
+  border-top-color: #191919;
+  border-radius: 50%;
+  margin: auto;
+  animation: spin .8s linear infinite;
+}
+
+.progress {
+  width: 100%;
+  height: 6px;
+  background: #e9e9e9;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #191919;
+  animation: progress 2.8s ease forwards;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes progress {
+  from {
+    width: 0%;
+  }
+
+  to {
+    width: 100%;
+  }
 }
 
 
@@ -367,6 +413,7 @@ input:focus {
   font-size: 13px;
   margin-bottom: 15px;
 }
+
 
 @media (max-width: 600px) {
 
