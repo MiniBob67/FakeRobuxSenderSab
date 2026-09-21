@@ -45,8 +45,10 @@ document.getElementById("findButton").addEventListener("click", async function (
   username = usernameInput.value.trim();
 
   if (username === "") {
+
     error.textContent = "Enter a username.";
     error.style.display = "block";
+
     return;
   }
 
@@ -63,9 +65,11 @@ document.getElementById("findButton").addEventListener("click", async function (
       "https://users.roblox.com/v1/usernames/users",
       {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json"
         },
+
         body: JSON.stringify({
           usernames: [username],
           excludeBannedUsers: false
@@ -95,6 +99,9 @@ document.getElementById("findButton").addEventListener("click", async function (
     userId = user.id;
     username = user.name;
 
+
+    /* GET AVATAR */
+
     const avatarResponse = await fetch(
       "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" +
       userId +
@@ -116,6 +123,7 @@ document.getElementById("findButton").addEventListener("click", async function (
       reviewAvatar.src = avatarUrl;
     }
 
+
     foundUsername.textContent = username;
 
     userCard.classList.remove("selected");
@@ -128,11 +136,11 @@ document.getElementById("findButton").addEventListener("click", async function (
       "Could not find the Roblox account.";
 
     error.style.display = "block";
-
   }
 
   button.disabled = false;
   button.textContent = "Continue";
+
 });
 
 
@@ -152,6 +160,7 @@ document.getElementById("selectButton").addEventListener("click", function () {
   amountUsername.textContent = username;
 
   showStep(document.getElementById("step3"));
+
 });
 
 
