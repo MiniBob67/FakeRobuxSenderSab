@@ -1,16 +1,20 @@
 let username = "";
 let amount = "";
+let userId = "";
+let avatarUrl = "";
 
-const step1 = document.getElementById("step1");
-const step2 = document.getElementById("step2");
-const step3 = document.getElementById("step3");
-const step4 = document.getElementById("step4");
-const step5 = document.getElementById("step5");
+const steps = document.querySelectorAll(".step");
 
 const usernameInput = document.getElementById("username");
 const error = document.getElementById("error");
 
+const userCard = document.getElementById("userCard");
 const foundUsername = document.getElementById("foundUsername");
+
+const userAvatar = document.getElementById("userAvatar");
+const amountAvatar = document.getElementById("amountAvatar");
+const reviewAvatar = document.getElementById("reviewAvatar");
+
 const amountUsername = document.getElementById("amountUsername");
 
 const reviewUsername = document.getElementById("reviewUsername");
@@ -19,16 +23,14 @@ const reviewAmount = document.getElementById("reviewAmount");
 
 const successText = document.getElementById("successText");
 
-const userCard = document.getElementById("userCard");
 const amountOptions = document.querySelectorAll(".amount-option");
-
 const selectedAmount = document.getElementById("selectedAmount");
 const reviewButton = document.getElementById("reviewButton");
 
 
 function showStep(step) {
 
-  document.querySelectorAll(".step").forEach(section => {
+  steps.forEach(section => {
     section.classList.remove("active");
   });
 
@@ -36,24 +38,101 @@ function showStep(step) {
 }
 
 
-/* STEP 1 */
+/* FIND ROBLOX USER */
 
-document.getElementById("findButton").addEventListener("click", function () {
+document.getElementById("findButton").addEventListener("click", async function () {
 
   username = usernameInput.value.trim();
 
   if (username === "") {
+    error.textContent = "Enter a username.";
     error.style.display = "block";
     return;
   }
 
   error.style.display = "none";
 
-  foundUsername.textContent = username;
+  const button = document.getElementById("findButton");
 
-  userCard.classList.remove("selected");
+  button.disabled = true;
+  button.textContent = "Searching...";
 
-  showStep(step2);
+  try {
+
+    const response = await fetch(
+      "https://users.roblox.com/v1/usernames/users",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          usernames: [username],
+          excludeBannedUsers: false
+        })
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Request failed");
+    }
+
+    const data = await response.json();
+
+    if (!data.data || data.data.length === 0) {
+
+      error.textContent = "User not found.";
+      error.style.display = "block";
+
+      button.disabled = false;
+      button.textContent = "Continue";
+
+      return;
+    }
+
+    const user = data.data[0];
+
+    userId = user.id;
+    username = user.name;
+
+    const avatarResponse = await fetch(
+      "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" +
+      userId +
+      "&size=150x150&format=Png&isCircular=false"
+    );
+
+    const avatarData = await avatarResponse.json();
+
+    if (
+      avatarData.data &&
+      avatarData.data.length > 0 &&
+      avatarData.data[0].imageUrl
+    ) {
+
+      avatarUrl = avatarData.data[0].imageUrl;
+
+      userAvatar.src = avatarUrl;
+      amountAvatar.src = avatarUrl;
+      reviewAvatar.src = avatarUrl;
+    }
+
+    foundUsername.textContent = username;
+
+    userCard.classList.remove("selected");
+
+    showStep(document.getElementById("step2"));
+
+  } catch (err) {
+
+    error.textContent =
+      "Could not find the Roblox account.";
+
+    error.style.display = "block";
+
+  }
+
+  button.disabled = false;
+  button.textContent = "Continue";
 });
 
 
@@ -68,15 +147,11 @@ userCard.addEventListener("click", function () {
 
 document.getElementById("selectButton").addEventListener("click", function () {
 
-  if (!userCard.classList.contains("selected")) {
-
-    userCard.classList.add("selected");
-
-  }
+  userCard.classList.add("selected");
 
   amountUsername.textContent = username;
 
-  showStep(step3);
+  showStep(document.getElementById("step3"));
 });
 
 
@@ -94,11 +169,9 @@ amountOptions.forEach(option => {
 
     amount = option.dataset.amount;
 
-    const formatted =
-      Number(amount).toLocaleString("en-US");
-
     selectedAmount.textContent =
-      "Selected: R$ " + formatted;
+      "Selected: R$ " +
+      Number(amount).toLocaleString("en-US");
 
     reviewButton.disabled = false;
 
@@ -112,12 +185,14 @@ amountOptions.forEach(option => {
 reviewButton.addEventListener("click", function () {
 
   reviewUsername.textContent = username;
+
   reviewRecipient.textContent = username;
 
   reviewAmount.textContent =
-    "R$ " + Number(amount).toLocaleString("en-US");
+    "R$ " +
+    Number(amount).toLocaleString("en-US");
 
-  showStep(step4);
+  showStep(document.getElementById("step4"));
 
 });
 
@@ -125,28 +200,44 @@ reviewButton.addEventListener("click", function () {
 /* BACK */
 
 document.getElementById("backToUsername").addEventListener("click", function () {
-  showStep(step1);
+
+  showStep(document.getElementById("step1"));
+
 });
 
 
 document.getElementById("backToUser").addEventListener("click", function () {
-  showStep(step2);
+
+  showStep(document.getElementById("step2"));
+
 });
 
 
 document.getElementById("backToAmount").addEventListener("click", function () {
-  showStep(step3);
+
+  showStep(document.getElementById("step3"));
+
 });
 
 
-/* COMPLETE */
+/* SEND */
 
 document.getElementById("confirmButton").addEventListener("click", function () {
 
-  successText.textContent =
-    `The simulated transfer of R$ ${Number(amount).toLocaleString("en-US")} to ${username} has been completed.`;
+  showStep(document.getElementById("step5"));
 
-  showStep(step5);
+  setTimeout(function () {
+
+    successText.textContent =
+      "The simulated transfer of R$ " +
+      Number(amount).toLocaleString("en-US") +
+      " to " +
+      username +
+      " has been completed.";
+
+    showStep(document.getElementById("step6"));
+
+  }, 3000);
 
 });
 
@@ -157,6 +248,8 @@ document.getElementById("doneButton").addEventListener("click", function () {
 
   username = "";
   amount = "";
+  userId = "";
+  avatarUrl = "";
 
   usernameInput.value = "";
 
@@ -166,10 +259,15 @@ document.getElementById("doneButton").addEventListener("click", function () {
     option.classList.remove("selected");
   });
 
-  selectedAmount.textContent = "Select an amount";
+  selectedAmount.textContent =
+    "Select an amount";
 
   reviewButton.disabled = true;
 
-  showStep(step1);
+  userAvatar.src = "";
+  amountAvatar.src = "";
+  reviewAvatar.src = "";
+
+  showStep(document.getElementById("step1"));
 
 });
