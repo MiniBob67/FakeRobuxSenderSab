@@ -1,104 +1,239 @@
-```javascript
-const usernameInput = document.getElementById("username");
-const amountInput = document.getElementById("amount");
-
-const findButton = document.getElementById("findButton");
-const sendButton = document.getElementById("sendButton");
-
-const userBox = document.getElementById("userBox");
-const foundUsername = document.getElementById("foundUsername");
-
-const processing = document.getElementById("processing");
-const success = document.getElementById("success");
-
-const successText = document.getElementById("successText");
-const closeButton = document.getElementById("closeButton");
-
-let selectedUser = "";
-
-
-/* FIND USER */
-
-findButton.addEventListener("click", () => {
-    const username = usernameInput.value.trim();
-
-    if (!username) {
-        userBox.classList.add("hidden");
-        selectedUser = "";
-        updateButton();
-        return;
-    }
-
-    selectedUser = username;
-
-    foundUsername.textContent = username;
-    userBox.classList.remove("hidden");
-
-    updateButton();
-});
-
-
-/* AMOUNT */
-
-amountInput.addEventListener("input", () => {
-    updateButton();
-});
-
-
-/* ENABLE SEND */
-
-function updateButton() {
-    const amount = Number(amountInput.value);
-
-    sendButton.disabled = !selectedUser || !amount || amount <= 0;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-
-/* SEND */
-
-sendButton.addEventListener("click", () => {
-    const amount = Number(amountInput.value);
-
-    if (!selectedUser || !amount || amount <= 0) {
-        return;
-    }
-
-    processing.classList.remove("hidden");
-
-    setTimeout(() => {
-        processing.classList.add("hidden");
-
-        successText.textContent =
-            formatNumber(amount) +
-            " Fake Robux were simulated as sent to " +
-            selectedUser +
-            ".";
-
-        success.classList.remove("hidden");
-    }, 1800);
-});
-
-
-/* CLOSE */
-
-closeButton.addEventListener("click", () => {
-    success.classList.add("hidden");
-});
-
-
-/* ESC */
-
-document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-        processing.classList.add("hidden");
-        success.classList.add("hidden");
-    }
-});
-
-
-/* NUMBER FORMAT */
-
-function formatNumber(number) {
-    return number.toLocaleString("en-US");
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f7f7f8;
+  color: #191919;
+  min-height: 100vh;
 }
-```
+
+.topbar {
+  height: 64px;
+  background: #111111;
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  color: white;
+}
+
+.logo {
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.main {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 55px 20px;
+}
+
+.panel {
+  width: 100%;
+  max-width: 520px;
+  background: white;
+  border: 1px solid #e1e1e1;
+  border-radius: 14px;
+  padding: 34px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+.step {
+  display: none;
+}
+
+.step.active {
+  display: block;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #707070;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 30px;
+}
+
+.label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.field {
+  margin-bottom: 21px;
+}
+
+input {
+  width: 100%;
+  height: 48px;
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+input:focus {
+  border-color: #555;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, .05);
+}
+
+.amount-box {
+  position: relative;
+}
+
+.amount-box span {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  color: #555;
+  font-weight: 700;
+}
+
+.amount-box input {
+  padding-left: 35px;
+}
+
+.button {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: 8px;
+  background: #191919;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .1s, opacity .15s;
+}
+
+.button:hover {
+  opacity: .9;
+}
+
+.button:active {
+  transform: scale(.99);
+}
+
+.back {
+  background: transparent;
+  color: #555;
+  margin-top: 10px;
+}
+
+.back:hover {
+  background: #f3f3f3;
+  opacity: 1;
+}
+
+.review {
+  border: 1px solid #e2e2e2;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 22px;
+}
+
+.review-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 17px;
+  border-bottom: 1px solid #e8e8e8;
+  font-size: 14px;
+}
+
+.review-row:last-child {
+  border-bottom: none;
+}
+
+.review-label {
+  color: #777;
+}
+
+.review-value {
+  font-weight: 700;
+  text-align: right;
+  max-width: 60%;
+  overflow-wrap: anywhere;
+}
+
+.success {
+  text-align: center;
+  padding: 15px 0 10px;
+}
+
+.success-icon {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: #191919;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.success h2 {
+  font-size: 25px;
+  margin-bottom: 9px;
+}
+
+.success p {
+  color: #707070;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 25px;
+}
+
+.notice {
+  margin-top: 25px;
+  padding: 12px 14px;
+  background: #fafafa;
+  border: 1px solid #e4e4e4;
+  border-radius: 8px;
+  color: #777;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.error {
+  display: none;
+  color: #b00020;
+  font-size: 13px;
+  margin-top: -8px;
+  margin-bottom: 15px;
+}
+
+@media (max-width: 600px) {
+  .topbar {
+    padding: 0 20px;
+  }
+
+  .main {
+    padding: 25px 14px;
+  }
+
+  .panel {
+    padding: 25px 20px;
+    border-radius: 12px;
+  }
+
+  .title {
+    font-size: 25px;
+  }
+}
