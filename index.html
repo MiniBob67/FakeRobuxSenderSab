@@ -1,253 +1,11 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>RBXSender</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f7f7f8;
-      color: #191919;
-      min-height: 100vh;
-    }
-
-    .topbar {
-      height: 64px;
-      background: #111111;
-      display: flex;
-      align-items: center;
-      padding: 0 32px;
-      color: white;
-    }
-
-    .logo {
-      font-size: 21px;
-      font-weight: 700;
-    }
-
-    .main {
-      min-height: calc(100vh - 64px);
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 55px 20px;
-    }
-
-    .panel {
-      width: 100%;
-      max-width: 520px;
-      background: white;
-      border: 1px solid #e1e1e1;
-      border-radius: 14px;
-      padding: 34px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
-    }
-
-    .step {
-      display: none;
-    }
-
-    .step.active {
-      display: block;
-    }
-
-    .title {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .subtitle {
-      color: #707070;
-      font-size: 14px;
-      line-height: 1.5;
-      margin-bottom: 30px;
-    }
-
-    .label {
-      display: block;
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    input {
-      width: 100%;
-      height: 48px;
-      border: 1px solid #d0d0d0;
-      border-radius: 8px;
-      padding: 0 14px;
-      font-size: 15px;
-      outline: none;
-      transition: border-color .15s, box-shadow .15s;
-    }
-
-    input:focus {
-      border-color: #555;
-      box-shadow: 0 0 0 3px rgba(0, 0, 0, .05);
-    }
-
-    .field {
-      margin-bottom: 21px;
-    }
-
-    .amount-box {
-      position: relative;
-    }
-
-    .amount-box span {
-      position: absolute;
-      left: 14px;
-      top: 14px;
-      color: #555;
-      font-weight: 700;
-    }
-
-    .amount-box input {
-      padding-left: 35px;
-    }
-
-    .button {
-      width: 100%;
-      height: 48px;
-      border: none;
-      border-radius: 8px;
-      background: #191919;
-      color: white;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform .1s, opacity .15s;
-    }
-
-    .button:hover {
-      opacity: .9;
-    }
-
-    .button:active {
-      transform: scale(.99);
-    }
-
-    .back {
-      background: transparent;
-      color: #555;
-      margin-top: 10px;
-    }
-
-    .back:hover {
-      background: #f3f3f3;
-      opacity: 1;
-    }
-
-    .review {
-      border: 1px solid #e2e2e2;
-      border-radius: 10px;
-      overflow: hidden;
-      margin-bottom: 22px;
-    }
-
-    .review-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 17px;
-      border-bottom: 1px solid #e8e8e8;
-      font-size: 14px;
-    }
-
-    .review-row:last-child {
-      border-bottom: none;
-    }
-
-    .review-label {
-      color: #777;
-    }
-
-    .review-value {
-      font-weight: 700;
-      text-align: right;
-      max-width: 60%;
-      overflow-wrap: anywhere;
-    }
-
-    .success {
-      text-align: center;
-      padding: 15px 0 10px;
-    }
-
-    .success-icon {
-      width: 58px;
-      height: 58px;
-      margin: 0 auto 20px;
-      border-radius: 50%;
-      background: #191919;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      font-weight: 700;
-    }
-
-    .success h2 {
-      font-size: 25px;
-      margin-bottom: 9px;
-    }
-
-    .success p {
-      color: #707070;
-      font-size: 14px;
-      line-height: 1.5;
-      margin-bottom: 25px;
-    }
-
-    .notice {
-      margin-top: 25px;
-      padding: 12px 14px;
-      background: #fafafa;
-      border: 1px solid #e4e4e4;
-      border-radius: 8px;
-      color: #777;
-      font-size: 11px;
-      line-height: 1.5;
-    }
-
-    .error {
-      display: none;
-      color: #b00020;
-      font-size: 13px;
-      margin-top: -8px;
-      margin-bottom: 15px;
-    }
-
-    @media (max-width: 600px) {
-      .topbar {
-        padding: 0 20px;
-      }
-
-      .main {
-        padding: 25px 14px;
-      }
-
-      .panel {
-        padding: 25px 20px;
-        border-radius: 12px;
-      }
-
-      .title {
-        font-size: 25px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -261,7 +19,6 @@
     <div class="panel">
 
       <!-- STEP 1 -->
-
       <section class="step active" id="step1">
 
         <h1 class="title">Send Robux</h1>
@@ -306,7 +63,7 @@
           Enter a username and a valid amount.
         </div>
 
-        <button class="button" onclick="continueToReview()">
+        <button class="button" id="continueButton">
           Continue
         </button>
 
@@ -314,7 +71,6 @@
 
 
       <!-- STEP 2 -->
-
       <section class="step" id="step2">
 
         <h1 class="title">Review</h1>
@@ -330,8 +86,7 @@
               Recipient
             </span>
 
-            <span class="review-value" id="reviewUsername">
-            </span>
+            <span class="review-value" id="reviewUsername"></span>
           </div>
 
           <div class="review-row">
@@ -339,17 +94,16 @@
               Amount
             </span>
 
-            <span class="review-value" id="reviewAmount">
-            </span>
+            <span class="review-value" id="reviewAmount"></span>
           </div>
 
         </div>
 
-        <button class="button" onclick="confirmTransfer()">
+        <button class="button" id="confirmButton">
           Continue
         </button>
 
-        <button class="button back" onclick="goBack()">
+        <button class="button back" id="backButton">
           Back
         </button>
 
@@ -357,7 +111,6 @@
 
 
       <!-- STEP 3 -->
-
       <section class="step" id="step3">
 
         <div class="success">
@@ -368,12 +121,11 @@
 
           <h2>Completed</h2>
 
-          <p id="successText">
-          </p>
+          <p id="successText"></p>
 
         </div>
 
-        <button class="button" onclick="resetForm()">
+        <button class="button" id="doneButton">
           Done
         </button>
 
@@ -388,94 +140,7 @@
 
   </main>
 
-
-  <script>
-
-    let username = "";
-    let amount = "";
-
-    function showStep(number) {
-
-      document.querySelectorAll(".step").forEach(step => {
-        step.classList.remove("active");
-      });
-
-      document
-        .getElementById("step" + number)
-        .classList.add("active");
-    }
-
-
-    function continueToReview() {
-
-      username =
-        document.getElementById("username").value.trim();
-
-      amount =
-        document.getElementById("amount").value.trim();
-
-      const error =
-        document.getElementById("error");
-
-      if (
-        username === "" ||
-        amount === "" ||
-        Number(amount) <= 0
-      ) {
-
-        error.style.display = "block";
-
-        return;
-      }
-
-      error.style.display = "none";
-
-      document.getElementById(
-        "reviewUsername"
-      ).textContent = username;
-
-      document.getElementById(
-        "reviewAmount"
-      ).textContent = "R$ " + amount;
-
-      showStep(2);
-    }
-
-
-    function goBack() {
-      showStep(1);
-    }
-
-
-    function confirmTransfer() {
-
-      document.getElementById(
-        "successText"
-      ).textContent =
-        `The simulated transfer of R$ ${amount} to ${username} has been completed.`;
-
-      showStep(3);
-    }
-
-
-    function resetForm() {
-
-      document.getElementById(
-        "username"
-      ).value = "";
-
-      document.getElementById(
-        "amount"
-      ).value = "";
-
-      username = "";
-      amount = "";
-
-      showStep(1);
-    }
-
-  </script>
+  <script src="script.js"></script>
 
 </body>
 </html>
-```
