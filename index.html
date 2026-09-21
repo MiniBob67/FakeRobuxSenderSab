@@ -2,94 +2,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Robux Sender</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <header class="topbar">
-        <div class="logo">Robux Sender</div>
+  <title>RBXSender</title>
 
-        <div class="balance">
-            <span id="balance">1,000,000</span>
-            <span>Fake Robux</span>
-        </div>
-    </header>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-    <main>
-        <div class="sender-card">
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f4f4;
+      color: #191919;
+      min-height: 100vh;
+    }
 
-            <div class="header">
-                <h1>Send Robux</h1>
-                <p>Send a fictional amount to a simulated user.</p>
-            </div>
+    .topbar {
+      height: 64px;
+      background: #111;
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      color: white;
+    }
 
-            <label for="username">Username</label>
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+    }
 
-            <div class="input-row">
-                <input
-                    id="username"
-                    type="text"
-                    placeholder="Enter username"
-                    autocomplete="off"
-                >
+    .container {
+      width: min(1050px, calc(100% - 32px));
+      margin: 45px auto;
+    }
 
-                <button id="findButton">Find</button>
-            </div>
+    .header {
+      margin-bottom: 25px;
+    }
 
-            <div id="userBox" class="user-box hidden">
-                <div class="avatar"></div>
+    .header h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
 
-                <div>
-                    <strong id="foundUsername"></strong>
-                    <span>User found</span>
-                </div>
-            </div>
+    .header p {
+      color: #666;
+      font-size: 15px;
+    }
 
-            <label for="amount">Amount</label>
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
 
-            <div class="amount-wrapper">
-                <input
-                    id="amount"
-                    type="number"
-                    min="1"
-                    placeholder="Enter amount"
-                >
+    .card {
+      background: white;
+      border: 1px solid #dedede;
+      border-radius: 10px;
+      padding: 28px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
 
-                <span>Fake Robux</span>
-            </div>
+    .card h2 {
+      font-size: 19px;
+      margin-bottom: 22px;
+    }
 
-            <button id="sendButton" class="send-button" disabled>
-                Send Robux
-            </button>
+    .field {
+      margin-bottom: 18px;
+    }
 
-            <p class="notice">
-                Fictional simulator. No real Robux are transferred.
-            </p>
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 7px;
+    }
 
-        </div>
-    </main>
+    input {
+      width: 100%;
+      height: 45px;
+      border: 1px solid #cfcfcf;
+      border-radius: 7px;
+      padding: 0 13px;
+      font-size: 15px;
+      outline: none;
+    }
 
-    <div id="processing" class="overlay hidden">
-        <div class="modal">
-            <div class="spinner"></div>
-            <h2>Processing</h2>
-            <p>Simulating the transfer...</p>
-        </div>
-    </div>
+    input:focus {
+      border-color: #777;
+    }
 
-    <div id="success" class="overlay hidden">
-        <div class="modal">
-            <div class="success">✓</div>
-            <h2>Transfer complete</h2>
-            <p id="successText"></p>
-            <button id="closeButton">Close</button>
-        </div>
-    </div>
+    .amount-wrapper {
+      position: relative;
+    }
 
-    <script src="script.js"></script>
-</body>
-</html>
+    .amount-wrapper span {
+      position: absolute;
+      left: 13px;
+      top: 13px;
+      font-weight: 700;
+      color: #555;
+    }
+
+    .amount-wrapper input {
+      padding-left: 30px;
+    }
+
+    button {
+      width: 100%;
+      height: 46px;
+      border: none;
+      border-radius: 7px;
+      background: #191919;
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: .88;
+    }
+
+    .status {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 7px;
+      background: #f1f1f1;
+      font-size: 14px;
+    }
+
+    .status.visible {
+      display: block;
+    }
+
+    .status-title {
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px 0;
+      border-bottom: 1px solid #ededed;
+    }
+
+    .history-item:last-child {
+      border-bottom:
 ```
