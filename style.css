@@ -72,7 +72,7 @@ body {
 }
 
 .field {
-  margin-bottom: 21px;
+  margin-bottom: 20px;
 }
 
 input {
@@ -83,28 +83,11 @@ input {
   padding: 0 14px;
   font-size: 15px;
   outline: none;
-  transition: border-color .15s, box-shadow .15s;
 }
 
 input:focus {
   border-color: #555;
   box-shadow: 0 0 0 3px rgba(0, 0, 0, .05);
-}
-
-.amount-box {
-  position: relative;
-}
-
-.amount-box span {
-  position: absolute;
-  left: 14px;
-  top: 14px;
-  color: #555;
-  font-weight: 700;
-}
-
-.amount-box input {
-  padding-left: 35px;
 }
 
 .button {
@@ -117,15 +100,16 @@ input:focus {
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: transform .1s, opacity .15s;
+  transition: .15s;
 }
 
 .button:hover {
   opacity: .9;
 }
 
-.button:active {
-  transform: scale(.99);
+.button:disabled {
+  opacity: .4;
+  cursor: not-allowed;
 }
 
 .back {
@@ -138,6 +122,171 @@ input:focus {
   background: #f3f3f3;
   opacity: 1;
 }
+
+
+/* USER CARD */
+
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border: 1px solid #dedede;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 22px;
+  cursor: pointer;
+  transition: .15s;
+}
+
+.user-card:hover {
+  border-color: #999;
+  background: #fafafa;
+}
+
+.user-card.selected {
+  border-color: #191919;
+  box-shadow: 0 0 0 2px #191919;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.username {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+
+.user-label {
+  color: #888;
+  font-size: 12px;
+}
+
+.selected-check {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #191919;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px;
+}
+
+
+/* AVATAR */
+
+.avatar,
+.small-avatar,
+.review-avatar {
+  background: #e8e8e8;
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 10px;
+}
+
+.small-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+}
+
+.review-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 9px;
+}
+
+.avatar-head {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  background: #c9956c;
+  border-radius: 50%;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.avatar-body {
+  position: absolute;
+  width: 36px;
+  height: 25px;
+  background: #333;
+  border-radius: 8px 8px 0 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+
+/* AMOUNTS */
+
+.recipient-mini,
+.review-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #ededed;
+  padding-bottom: 18px;
+  margin-bottom: 22px;
+}
+
+.amount-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.amount-option {
+  height: 70px;
+  border: 1px solid #d8d8d8;
+  background: white;
+  border-radius: 10px;
+  font-size: 19px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .15s;
+}
+
+.amount-option span {
+  font-size: 13px;
+  margin-right: 4px;
+  color: #666;
+}
+
+.amount-option:hover {
+  border-color: #777;
+  background: #fafafa;
+}
+
+.amount-option.selected {
+  border-color: #191919;
+  background: #191919;
+  color: white;
+}
+
+.amount-option.selected span {
+  color: #ddd;
+}
+
+.selected-amount {
+  text-align: center;
+  color: #777;
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+
+
+/* REVIEW */
 
 .review {
   border: 1px solid #e2e2e2;
@@ -165,9 +314,10 @@ input:focus {
 .review-value {
   font-weight: 700;
   text-align: right;
-  max-width: 60%;
-  overflow-wrap: anywhere;
 }
+
+
+/* SUCCESS */
 
 .success {
   text-align: center;
@@ -215,11 +365,11 @@ input:focus {
   display: none;
   color: #b00020;
   font-size: 13px;
-  margin-top: -8px;
   margin-bottom: 15px;
 }
 
 @media (max-width: 600px) {
+
   .topbar {
     padding: 0 20px;
   }
@@ -230,7 +380,6 @@ input:focus {
 
   .panel {
     padding: 25px 20px;
-    border-radius: 12px;
   }
 
   .title {
