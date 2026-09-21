@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>RBXSender</title>
 
   <style>
@@ -15,14 +16,14 @@
 
     body {
       font-family: Arial, Helvetica, sans-serif;
-      background: #f4f4f4;
+      background: #f7f7f8;
       color: #191919;
       min-height: 100vh;
     }
 
     .topbar {
       height: 64px;
-      background: #111;
+      background: #111111;
       display: flex;
       align-items: center;
       padding: 0 32px;
@@ -30,185 +31,220 @@
     }
 
     .logo {
-      font-size: 22px;
+      font-size: 21px;
       font-weight: 700;
     }
 
-    .container {
-      width: min(1050px, calc(100% - 32px));
-      margin: 45px auto;
+    .main {
+      min-height: calc(100vh - 64px);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 55px 20px;
     }
 
-    .header {
-      margin-bottom: 25px;
+    .panel {
+      width: 100%;
+      max-width: 520px;
+      background: white;
+      border: 1px solid #e1e1e1;
+      border-radius: 14px;
+      padding: 34px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
     }
 
-    .header h1 {
-      font-size: 32px;
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: 700;
       margin-bottom: 8px;
     }
 
-    .header p {
-      color: #666;
-      font-size: 15px;
+    .subtitle {
+      color: #707070;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 30px;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 22px;
-    }
-
-    .card {
-      background: white;
-      border: 1px solid #dedede;
-      border-radius: 10px;
-      padding: 28px;
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
-    }
-
-    .card h2 {
-      font-size: 19px;
-      margin-bottom: 22px;
-    }
-
-    .field {
-      margin-bottom: 18px;
-    }
-
-    .field label {
+    .label {
       display: block;
       font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 7px;
+      font-weight: 700;
+      margin-bottom: 8px;
     }
 
     input {
       width: 100%;
-      height: 45px;
-      border: 1px solid #cfcfcf;
-      border-radius: 7px;
-      padding: 0 13px;
+      height: 48px;
+      border: 1px solid #d0d0d0;
+      border-radius: 8px;
+      padding: 0 14px;
       font-size: 15px;
       outline: none;
+      transition: border-color .15s, box-shadow .15s;
     }
 
     input:focus {
-      border-color: #777;
+      border-color: #555;
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, .05);
     }
 
-    .amount-wrapper {
+    .field {
+      margin-bottom: 21px;
+    }
+
+    .amount-box {
       position: relative;
     }
 
-    .amount-wrapper span {
+    .amount-box span {
       position: absolute;
-      left: 13px;
-      top: 13px;
-      font-weight: 700;
+      left: 14px;
+      top: 14px;
       color: #555;
+      font-weight: 700;
     }
 
-    .amount-wrapper input {
-      padding-left: 30px;
+    .amount-box input {
+      padding-left: 35px;
     }
 
-    button {
+    .button {
       width: 100%;
-      height: 46px;
+      height: 48px;
       border: none;
-      border-radius: 7px;
+      border-radius: 8px;
       background: #191919;
       color: white;
       font-size: 15px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
-      transition: opacity 0.15s, transform 0.1s;
+      transition: transform .1s, opacity .15s;
     }
 
-    button:hover {
-      opacity: 0.88;
+    .button:hover {
+      opacity: .9;
     }
 
-    button:active {
-      transform: scale(0.99);
+    .button:active {
+      transform: scale(.99);
     }
 
-    .status {
-      display: none;
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 7px;
-      background: #f1f1f1;
+    .back {
+      background: transparent;
+      color: #555;
+      margin-top: 10px;
+    }
+
+    .back:hover {
+      background: #f3f3f3;
+      opacity: 1;
+    }
+
+    .review {
+      border: 1px solid #e2e2e2;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 22px;
+    }
+
+    .review-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 17px;
+      border-bottom: 1px solid #e8e8e8;
       font-size: 14px;
     }
 
-    .status.visible {
-      display: block;
-    }
-
-    .status-title {
-      font-weight: 700;
-      margin-bottom: 5px;
-    }
-
-    .history-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 0;
-      border-bottom: 1px solid #ededed;
-    }
-
-    .history-item:last-child {
+    .review-row:last-child {
       border-bottom: none;
     }
 
-    .user {
-      font-weight: 600;
-      font-size: 14px;
+    .review-label {
+      color: #777;
     }
 
-    .date {
-      font-size: 12px;
-      color: #888;
-      margin-top: 4px;
-    }
-
-    .amount {
+    .review-value {
       font-weight: 700;
+      text-align: right;
+      max-width: 60%;
+      overflow-wrap: anywhere;
+    }
+
+    .success {
+      text-align: center;
+      padding: 15px 0 10px;
+    }
+
+    .success-icon {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      background: #191919;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    .success h2 {
+      font-size: 25px;
+      margin-bottom: 9px;
+    }
+
+    .success p {
+      color: #707070;
       font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 25px;
     }
 
     .notice {
-      margin-top: 22px;
-      padding: 12px 15px;
+      margin-top: 25px;
+      padding: 12px 14px;
       background: #fafafa;
-      border: 1px solid #e3e3e3;
-      border-radius: 7px;
+      border: 1px solid #e4e4e4;
+      border-radius: 8px;
       color: #777;
-      font-size: 12px;
+      font-size: 11px;
       line-height: 1.5;
     }
 
-    footer {
-      text-align: center;
-      color: #999;
-      font-size: 12px;
-      padding: 30px 0;
+    .error {
+      display: none;
+      color: #b00020;
+      font-size: 13px;
+      margin-top: -8px;
+      margin-bottom: 15px;
     }
 
-    @media (max-width: 760px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .container {
-        margin-top: 30px;
-      }
-
+    @media (max-width: 600px) {
       .topbar {
         padding: 0 20px;
+      }
+
+      .main {
+        padding: 25px 14px;
+      }
+
+      .panel {
+        padding: 25px 20px;
+        border-radius: 12px;
+      }
+
+      .title {
+        font-size: 25px;
       }
     }
   </style>
@@ -216,24 +252,28 @@
 
 <body>
 
-  <div class="topbar">
+  <header class="topbar">
     <div class="logo">RBXSender</div>
-  </div>
+  </header>
 
-  <main class="container">
+  <main class="main">
 
-    <div class="header">
-      <h1>Send Robux</h1>
-      <p>Enter a username and amount below.</p>
-    </div>
+    <div class="panel">
 
-    <div class="grid">
+      <!-- STEP 1 -->
 
-      <section class="card">
-        <h2>Send Robux</h2>
+      <section class="step active" id="step1">
+
+        <h1 class="title">Send Robux</h1>
+
+        <p class="subtitle">
+          Choose a recipient and enter the amount you want to send.
+        </p>
 
         <div class="field">
-          <label for="username">Username</label>
+          <label class="label" for="username">
+            Recipient
+          </label>
 
           <input
             id="username"
@@ -244,9 +284,12 @@
         </div>
 
         <div class="field">
-          <label for="amount">Amount</label>
 
-          <div class="amount-wrapper">
+          <label class="label" for="amount">
+            Amount
+          </label>
+
+          <div class="amount-box">
             <span>R$</span>
 
             <input
@@ -256,56 +299,87 @@
               placeholder="0"
             >
           </div>
+
         </div>
 
-        <button onclick="sendRobux()">
-          Send Robux
+        <div class="error" id="error">
+          Enter a username and a valid amount.
+        </div>
+
+        <button class="button" onclick="continueToReview()">
+          Continue
         </button>
 
-        <div class="status" id="status">
-          <div class="status-title" id="statusTitle"></div>
-          <div id="statusText"></div>
-        </div>
       </section>
 
-      <section class="card">
 
-        <h2>Recent Activity</h2>
+      <!-- STEP 2 -->
 
-        <div class="history">
+      <section class="step" id="step2">
 
-          <div class="history-item">
-            <div>
-              <div class="user">PlayerOne</div>
-              <div class="date">Today</div>
-            </div>
+        <h1 class="title">Review</h1>
 
-            <div class="amount">R$ 250</div>
+        <p class="subtitle">
+          Check the details before continuing.
+        </p>
+
+        <div class="review">
+
+          <div class="review-row">
+            <span class="review-label">
+              Recipient
+            </span>
+
+            <span class="review-value" id="reviewUsername">
+            </span>
           </div>
 
-          <div class="history-item">
-            <div>
-              <div class="user">BuilderMax</div>
-              <div class="date">Today</div>
-            </div>
+          <div class="review-row">
+            <span class="review-label">
+              Amount
+            </span>
 
-            <div class="amount">R$ 500</div>
-          </div>
-
-          <div class="history-item">
-            <div>
-              <div class="user">PixelMaster</div>
-              <div class="date">Yesterday</div>
-            </div>
-
-            <div class="amount">R$ 100</div>
+            <span class="review-value" id="reviewAmount">
+            </span>
           </div>
 
         </div>
+
+        <button class="button" onclick="confirmTransfer()">
+          Continue
+        </button>
+
+        <button class="button back" onclick="goBack()">
+          Back
+        </button>
+
+      </section>
+
+
+      <!-- STEP 3 -->
+
+      <section class="step" id="step3">
+
+        <div class="success">
+
+          <div class="success-icon">
+            ✓
+          </div>
+
+          <h2>Completed</h2>
+
+          <p id="successText">
+          </p>
+
+        </div>
+
+        <button class="button" onclick="resetForm()">
+          Done
+        </button>
 
         <div class="notice">
           This is an independent fictional interface and is not
-          affiliated with Roblox Corporation.
+          affiliated with or operated by Roblox Corporation.
         </div>
 
       </section>
@@ -314,55 +388,92 @@
 
   </main>
 
-  <footer>
-    RBXSender
-  </footer>
 
   <script>
-    function sendRobux() {
-      const username =
+
+    let username = "";
+    let amount = "";
+
+    function showStep(number) {
+
+      document.querySelectorAll(".step").forEach(step => {
+        step.classList.remove("active");
+      });
+
+      document
+        .getElementById("step" + number)
+        .classList.add("active");
+    }
+
+
+    function continueToReview() {
+
+      username =
         document.getElementById("username").value.trim();
 
-      const amount =
-        document.getElementById("amount").value;
+      amount =
+        document.getElementById("amount").value.trim();
 
-      const status =
-        document.getElementById("status");
+      const error =
+        document.getElementById("error");
 
-      const statusTitle =
-        document.getElementById("statusTitle");
+      if (
+        username === "" ||
+        amount === "" ||
+        Number(amount) <= 0
+      ) {
 
-      const statusText =
-        document.getElementById("statusText");
-
-      if (!username || !amount || Number(amount) <= 0) {
-        status.classList.add("visible");
-
-        statusTitle.textContent =
-          "Missing information";
-
-        statusText.textContent =
-          "Please enter a username and a valid amount.";
+        error.style.display = "block";
 
         return;
       }
 
-      status.classList.add("visible");
+      error.style.display = "none";
 
-      statusTitle.textContent =
-        "Processing...";
+      document.getElementById(
+        "reviewUsername"
+      ).textContent = username;
 
-      statusText.textContent =
-        "Preparing the transfer interface.";
+      document.getElementById(
+        "reviewAmount"
+      ).textContent = "R$ " + amount;
 
-      setTimeout(() => {
-        statusTitle.textContent =
-          "Completed";
-
-        statusText.textContent =
-          `The simulated transfer of R$ ${amount} to ${username} has been completed.`;
-      }, 1800);
+      showStep(2);
     }
+
+
+    function goBack() {
+      showStep(1);
+    }
+
+
+    function confirmTransfer() {
+
+      document.getElementById(
+        "successText"
+      ).textContent =
+        `The simulated transfer of R$ ${amount} to ${username} has been completed.`;
+
+      showStep(3);
+    }
+
+
+    function resetForm() {
+
+      document.getElementById(
+        "username"
+      ).value = "";
+
+      document.getElementById(
+        "amount"
+      ).value = "";
+
+      username = "";
+      amount = "";
+
+      showStep(1);
+    }
+
   </script>
 
 </body>
