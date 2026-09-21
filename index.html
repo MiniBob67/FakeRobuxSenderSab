@@ -3,18 +3,282 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GitHub Pages Test</title>
+  <title>RBXSender</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <h1 style="color:red; text-align:center; margin-top:100px;">
-    NEW VERSION TEST
-  </h1>
+  <header class="topbar">
+    <div class="logo">RBXSender</div>
+  </header>
 
-  <p style="text-align:center; font-family:Arial;">
-    If you can see this, GitHub Pages is using this index.html.
-  </p>
+  <main class="main">
+
+    <div class="panel">
+
+      <!-- STEP 1 -->
+
+      <section class="step active" id="step1">
+
+        <h1 class="title">Send Robux</h1>
+
+        <p class="subtitle">
+          Enter a username to find a recipient.
+        </p>
+
+        <div class="field">
+          <label class="label" for="username">Username</label>
+
+          <input
+            id="username"
+            type="text"
+            placeholder="Enter username"
+            autocomplete="off"
+          >
+        </div>
+
+        <div class="error" id="error">
+          Enter a username.
+        </div>
+
+        <button class="button" id="findButton">
+          Continue
+        </button>
+
+      </section>
+
+
+      <!-- STEP 2 -->
+
+      <section class="step" id="step2">
+
+        <h1 class="title">Select recipient</h1>
+
+        <p class="subtitle">
+          Select the account you want to send Robux to.
+        </p>
+
+        <div class="user-card" id="userCard">
+
+          <div class="avatar">
+            <img id="userAvatar" src="" alt="Avatar">
+          </div>
+
+          <div class="user-info">
+
+            <div class="username" id="foundUsername">
+              Username
+            </div>
+
+            <div class="user-label">
+              Recipient
+            </div>
+
+          </div>
+
+          <div class="selected-check">
+            ✓
+          </div>
+
+        </div>
+
+        <button class="button" id="selectButton">
+          Continue
+        </button>
+
+        <button class="button back" id="backToUsername">
+          Back
+        </button>
+
+      </section>
+
+
+      <!-- STEP 3 -->
+
+      <section class="step" id="step3">
+
+        <h1 class="title">Choose amount</h1>
+
+        <p class="subtitle">
+          Select how much Robux you want to send.
+        </p>
+
+        <div class="recipient-mini">
+
+          <div class="small-avatar">
+            <img id="amountAvatar" src="" alt="Avatar">
+          </div>
+
+          <div>
+            <div class="username" id="amountUsername">
+              Username
+            </div>
+
+            <div class="user-label">
+              Recipient
+            </div>
+          </div>
+
+        </div>
+
+        <div class="amount-grid">
+
+          <button class="amount-option" data-amount="50000">
+            <span>R$</span>50,000
+          </button>
+
+          <button class="amount-option" data-amount="100000">
+            <span>R$</span>100,000
+          </button>
+
+          <button class="amount-option" data-amount="200000">
+            <span>R$</span>200,000
+          </button>
+
+          <button class="amount-option" data-amount="250000">
+            <span>R$</span>250,000
+          </button>
+
+        </div>
+
+        <div class="selected-amount" id="selectedAmount">
+          Select an amount
+        </div>
+
+        <button class="button" id="reviewButton" disabled>
+          Continue
+        </button>
+
+        <button class="button back" id="backToUser">
+          Back
+        </button>
+
+      </section>
+
+
+      <!-- STEP 4 -->
+
+      <section class="step" id="step4">
+
+        <h1 class="title">Review</h1>
+
+        <p class="subtitle">
+          Check the details before continuing.
+        </p>
+
+        <div class="review-user">
+
+          <div class="review-avatar">
+            <img id="reviewAvatar" src="" alt="Avatar">
+          </div>
+
+          <div>
+
+            <div class="username" id="reviewUsername">
+              Username
+            </div>
+
+            <div class="user-label">
+              Recipient
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="review">
+
+          <div class="review-row">
+
+            <span class="review-label">
+              Recipient
+            </span>
+
+            <span class="review-value" id="reviewRecipient">
+            </span>
+
+          </div>
+
+          <div class="review-row">
+
+            <span class="review-label">
+              Amount
+            </span>
+
+            <span class="review-value" id="reviewAmount">
+            </span>
+
+          </div>
+
+        </div>
+
+        <button class="button" id="confirmButton">
+          Send
+        </button>
+
+        <button class="button back" id="backToAmount">
+          Back
+        </button>
+
+      </section>
+
+
+      <!-- STEP 5 SENDING -->
+
+      <section class="step" id="step5">
+
+        <div class="sending">
+
+          <div class="spinner"></div>
+
+          <h2>Sending...</h2>
+
+          <p>
+            Processing your simulated transfer.
+          </p>
+
+          <div class="progress">
+            <div class="progress-bar"></div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- STEP 6 COMPLETED -->
+
+      <section class="step" id="step6">
+
+        <div class="success">
+
+          <div class="success-icon">
+            ✓
+          </div>
+
+          <h2>Completed</h2>
+
+          <p id="successText"></p>
+
+        </div>
+
+        <button class="button" id="doneButton">
+          Done
+        </button>
+
+        <div class="notice">
+          This is an independent fictional interface and is not
+          affiliated with or operated by Roblox Corporation.
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <script src="script.js"></script>
 
 </body>
 </html>
