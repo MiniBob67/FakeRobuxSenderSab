@@ -9,32 +9,10 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-.topbar {
-  height: 64px;
-  background: #ffffff;
-  border-bottom: 1px solid #e5e5e7;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding: 0 32px;
-}
-
-.brand {
-  font-size: 19px;
-  font-weight: 700;
-}
-
-.mode {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.7px;
-  color: #71717a;
-}
+/* NO HEADER / NO CORNER TEXT */
 
 .page {
-  min-height: calc(100vh - 112px);
+  min-height: 100vh;
 
   display: flex;
   justify-content: center;
@@ -50,6 +28,7 @@ body {
   max-width: 520px;
 
   background: #ffffff;
+
   border: 1px solid #e4e4e7;
   border-radius: 16px;
 
@@ -69,18 +48,21 @@ body {
 
 .header h1 {
   margin: 0 0 8px;
+
   font-size: 28px;
   letter-spacing: -0.5px;
 }
 
 .header p {
   margin: 0;
+
   color: #71717a;
   font-size: 14px;
 }
 
 .label {
   display: block;
+
   margin-bottom: 8px;
 
   font-size: 13px;
@@ -97,6 +79,7 @@ body {
   padding: 0 14px;
 
   font-size: 15px;
+
   outline: none;
 
   transition: 0.15s;
@@ -108,6 +91,7 @@ body {
 
 .status {
   min-height: 20px;
+
   margin-top: 10px;
 
   font-size: 13px;
@@ -144,6 +128,7 @@ body {
 
 .result-card:hover {
   background: #f7f7f8;
+
   border-color: #bdbdc2;
 }
 
@@ -163,6 +148,7 @@ body {
 .result-avatar img {
   width: 100%;
   height: 100%;
+
   object-fit: cover;
 }
 
@@ -177,6 +163,7 @@ body {
 
 .result-id {
   margin-top: 3px;
+
   color: #71717a;
   font-size: 12px;
 }
@@ -224,7 +211,9 @@ button {
 
 .primary:disabled {
   background: #d4d4d8;
+
   color: #71717a;
+
   cursor: not-allowed;
 }
 
@@ -281,6 +270,7 @@ button {
   margin-top: 4px;
 
   font-size: 12px;
+
   color: #71717a;
 }
 
@@ -362,6 +352,7 @@ button {
 
 .amount-option.selected {
   border-color: #18181b;
+
   background: #18181b;
   color: #ffffff;
 }
@@ -383,6 +374,7 @@ button {
   text-align: center;
 
   font-size: 13px;
+
   color: #52525b;
 }
 
@@ -513,10 +505,6 @@ footer {
 }
 
 @media (max-width: 600px) {
-
-  .topbar {
-    padding: 0 18px;
-  }
 
   .page {
     padding: 25px 12px;
