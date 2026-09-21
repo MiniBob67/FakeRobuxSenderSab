@@ -4,6 +4,7 @@ let userId = "";
 let avatarUrl = "";
 
 let searchTimer = null;
+let searchRequestId = 0;
 
 const steps = document.querySelectorAll(".screen");
 
@@ -59,20 +60,27 @@ const amountOptions =
   document.querySelectorAll(".amount-option");
 
 
+/* =========================
+   STEP CONTROL
+========================= */
+
 function showStep(id) {
 
   steps.forEach(step => {
     step.classList.remove("active");
   });
 
-  document.getElementById(id)
-    .classList.add("active");
+  const target =
+    document.getElementById(id);
 
+  if (target) {
+    target.classList.add("active");
+  }
 }
 
 
 /* =========================
-   ROBLOX USER SEARCH
+   USERNAME INPUT
 ========================= */
 
 usernameInput.addEventListener(
@@ -84,17 +92,28 @@ usernameInput.addEventListener(
 
     clearTimeout(searchTimer);
 
+    searchRequestId++;
+
     results.innerHTML = "";
     error.style.display = "none";
 
     continueButton.disabled = true;
 
+    userId = "";
+    username = "";
+    avatarUrl = "";
+
+    if (keyword.length === 0) {
+
+      searchStatus.textContent = "";
+
+      return;
+    }
+
     if (keyword.length < 2) {
 
       searchStatus.textContent =
-        keyword.length === 0
-          ? ""
-          : "Type at least 2 characters.";
+        "Type at least 2 characters.";
 
       return;
     }
@@ -102,8 +121,16 @@ usernameInput.addEventListener(
     searchStatus.textContent =
       "Searching...";
 
+    const currentRequest =
+      searchRequestId;
+
     searchTimer = setTimeout(
-      () => searchUsers(keyword),
+      () => {
+        searchUsers(
+          keyword,
+          currentRequest
+        );
+      },
       350
     );
 
@@ -111,30 +138,95 @@ usernameInput.addEventListener(
 );
 
 
-async function searchUsers(keyword) {
+/* =========================
+   SEARCH USERS
+========================= */
+
+async function searchUsers(
+  keyword,
+  currentRequest
+) {
 
   try {
 
-    const url =
-      "https://users.roblox.com/v1/users/search" +
-      "?keyword=" +
-      encodeURIComponent(keyword) +
-      "&limit=10";
+    /*
+      FIRST:
+      Exact username lookup.
+      This uses Roblox's dedicated
+      username endpoint.
+    */
 
-    const response =
-      await fetch(url);
+    const exactUser =
+      await lookupExactUsername(keyword);
 
-    if (!response.ok) {
-      throw new Error("Search failed");
+    /*
+      Ignore old request results
+      when the user typed something
+      new while this request was running.
+    */
+
+    if (
+      currentRequest !== searchRequestId
+    ) {
+      return;
     }
 
-    const data =
-      await response.json();
+
+    /*
+      SECOND:
+      Normal search for similar names.
+    */
+
+    const searchUsersData =
+      await searchSimilarUsers(keyword);
+
+
+    if (
+      currentRequest !== searchRequestId
+    ) {
+      return;
+    }
+
+
+    /*
+      Combine exact result + normal results.
+      Exact match always goes first.
+    */
+
+    const combined = [];
+
+    const seenIds =
+      new Set();
+
+
+    if (exactUser) {
+
+      combined.push(exactUser);
+
+      seenIds.add(
+        exactUser.id
+      );
+
+    }
+
+
+    searchUsersData.forEach(user => {
+
+      if (!seenIds.has(user.id)) {
+
+        combined.push(user);
+
+        seenIds.add(user.id);
+
+      }
+
+    });
+
 
     results.innerHTML = "";
 
-    if (!data.data ||
-        data.data.length === 0) {
+
+    if (combined.length === 0) {
 
       searchStatus.textContent =
         "No users found.";
@@ -142,80 +234,57 @@ async function searchUsers(keyword) {
       return;
     }
 
+
     searchStatus.textContent =
       "Select a user:";
 
+
+    /*
+      Get avatars for all results.
+    */
+
     const ids =
-      data.data
+      combined
         .map(user => user.id)
         .join(",");
 
-    const avatarResponse =
-      await fetch(
-        "https://thumbnails.roblox.com/v1/users/avatar-headshot" +
-        "?userIds=" +
-        ids +
-        "&size=150x150" +
-        "&format=Png" +
-        "&isCircular=false"
-      );
 
-    const avatarData =
-      await avatarResponse.json();
+    const avatarMap =
+      await getAvatars(ids);
 
-    const avatarMap = {};
 
-    if (avatarData.data) {
-
-      avatarData.data.forEach(item => {
-
-        avatarMap[item.targetId] =
-          item.imageUrl;
-
-      });
-
+    if (
+      currentRequest !== searchRequestId
+    ) {
+      return;
     }
 
 
-    data.data.forEach(user => {
-
-      const card =
-        document.createElement("button");
-
-      card.className =
-        "result-card";
+    combined.forEach(user => {
 
       const avatar =
         avatarMap[user.id] || "";
 
-      card.innerHTML = `
-        <div class="result-avatar">
-          <img src="${avatar}" alt="">
-        </div>
-
-        <div class="result-info">
-          <div class="result-username">
-            ${escapeHtml(user.name)}
-          </div>
-
-          <div class="result-id">
-            User ID: ${user.id}
-          </div>
-        </div>
-      `;
-
-      card.addEventListener(
-        "click",
-        () => selectUser(user, avatar)
+      createResultCard(
+        user,
+        avatar
       );
-
-      results.appendChild(card);
 
     });
 
+
   } catch (err) {
 
-    console.error(err);
+    console.error(
+      "Roblox search error:",
+      err
+    );
+
+    if (
+      currentRequest !== searchRequestId
+    ) {
+      return;
+    }
 
     searchStatus.textContent = "";
 
@@ -231,6 +300,249 @@ async function searchUsers(keyword) {
 
 
 /* =========================
+   EXACT USERNAME LOOKUP
+========================= */
+
+async function lookupExactUsername(
+  keyword
+) {
+
+  try {
+
+    const response =
+      await fetch(
+        "https://users.roblox.com/v1/usernames/users",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+
+            "Accept":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+
+            usernames: [
+              keyword
+            ],
+
+            excludeBannedUsers:
+              false
+
+          })
+        }
+      );
+
+
+    if (!response.ok) {
+
+      console.warn(
+        "Exact username lookup failed:",
+        response.status
+      );
+
+      return null;
+    }
+
+
+    const data =
+      await response.json();
+
+
+    if (
+      !data.data ||
+      data.data.length === 0
+    ) {
+      return null;
+    }
+
+
+    /*
+      Find exact requested username.
+    */
+
+    const exact =
+      data.data.find(
+        user =>
+          user.requestedUsername
+            ?.toLowerCase() ===
+          keyword.toLowerCase()
+      );
+
+
+    return exact || null;
+
+  } catch (err) {
+
+    console.warn(
+      "Exact username lookup error:",
+      err
+    );
+
+    return null;
+
+  }
+
+}
+
+
+/* =========================
+   NORMAL SEARCH
+========================= */
+
+async function searchSimilarUsers(
+  keyword
+) {
+
+  const url =
+    "https://users.roblox.com/v1/users/search" +
+    "?keyword=" +
+    encodeURIComponent(keyword) +
+    "&limit=10";
+
+
+  const response =
+    await fetch(url);
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      "Normal search failed"
+    );
+
+  }
+
+
+  const data =
+    await response.json();
+
+
+  if (
+    !data.data ||
+    !Array.isArray(data.data)
+  ) {
+    return [];
+  }
+
+
+  return data.data;
+
+}
+
+
+/* =========================
+   GET AVATARS
+========================= */
+
+async function getAvatars(ids) {
+
+  const response =
+    await fetch(
+      "https://thumbnails.roblox.com/v1/users/avatar-headshot" +
+      "?userIds=" +
+      encodeURIComponent(ids) +
+      "&size=150x150" +
+      "&format=Png" +
+      "&isCircular=false"
+    );
+
+
+  if (!response.ok) {
+
+    return {};
+
+  }
+
+
+  const data =
+    await response.json();
+
+
+  const avatarMap = {};
+
+
+  if (
+    data.data &&
+    Array.isArray(data.data)
+  ) {
+
+    data.data.forEach(item => {
+
+      avatarMap[item.targetId] =
+        item.imageUrl;
+
+    });
+
+  }
+
+
+  return avatarMap;
+
+}
+
+
+/* =========================
+   RESULT CARD
+========================= */
+
+function createResultCard(
+  user,
+  avatar
+) {
+
+  const card =
+    document.createElement("button");
+
+  card.className =
+    "result-card";
+
+
+  card.type =
+    "button";
+
+
+  card.innerHTML = `
+    <div class="result-avatar">
+      <img src="${escapeAttribute(avatar)}" alt="">
+    </div>
+
+    <div class="result-info">
+
+      <div class="result-username">
+        ${escapeHtml(user.name)}
+      </div>
+
+      <div class="result-id">
+        User ID: ${user.id}
+      </div>
+
+    </div>
+  `;
+
+
+  card.addEventListener(
+    "click",
+    function () {
+
+      selectUser(
+        user,
+        avatar
+      );
+
+    }
+  );
+
+
+  results.appendChild(card);
+
+}
+
+
+/* =========================
    SAFE TEXT
 ========================= */
 
@@ -240,9 +552,24 @@ function escapeHtml(text) {
     document.createElement("div");
 
   div.textContent =
-    text;
+    String(text ?? "");
 
   return div.innerHTML;
+
+}
+
+
+/* =========================
+   SAFE ATTRIBUTE
+========================= */
+
+function escapeAttribute(text) {
+
+  return String(text ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 
 }
 
@@ -251,7 +578,10 @@ function escapeHtml(text) {
    SELECT USER
 ========================= */
 
-function selectUser(user, avatar) {
+function selectUser(
+  user,
+  avatar
+) {
 
   userId =
     user.id;
@@ -262,17 +592,20 @@ function selectUser(user, avatar) {
   avatarUrl =
     avatar;
 
+
   selectedUsername.textContent =
     username;
 
   selectedAvatar.src =
     avatarUrl;
 
+
   amountUsername.textContent =
     username;
 
   amountAvatar.src =
     avatarUrl;
+
 
   reviewUsername.textContent =
     username;
@@ -283,10 +616,13 @@ function selectUser(user, avatar) {
   reviewAvatar.src =
     avatarUrl;
 
+
   continueButton.disabled =
     false;
 
+
   results.innerHTML = "";
+
 
   searchStatus.textContent =
     "Selected: " + username;
@@ -302,7 +638,9 @@ continueButton.addEventListener(
   "click",
   function () {
 
-    if (!userId) return;
+    if (!userId) {
+      return;
+    }
 
     showStep("step2");
 
@@ -319,6 +657,10 @@ document
   .addEventListener(
     "click",
     function () {
+
+      if (!userId) {
+        return;
+      }
 
       showStep("step3");
 
@@ -342,58 +684,89 @@ document
    STEP 3 — AMOUNT
 ========================= */
 
-amountOptions.forEach(option => {
+amountOptions.forEach(
+  option => {
 
-  option.addEventListener(
-    "click",
-    function () {
+    option.addEventListener(
+      "click",
+      function () {
 
-      amountOptions.forEach(button => {
-        button.classList.remove("selected");
-      });
+        amountOptions.forEach(
+          button => {
 
-      option.classList.add("selected");
+            button.classList.remove(
+              "selected"
+            );
 
-      amount =
-        option.dataset.amount;
+          }
+        );
 
-      selectedAmount.textContent =
-        "Selected: R$ " +
-        Number(amount)
-          .toLocaleString("en-US");
 
-      reviewButton.disabled =
-        false;
+        option.classList.add(
+          "selected"
+        );
 
-    }
-  );
 
-});
+        amount =
+          option.dataset.amount;
 
+
+        selectedAmount.textContent =
+          "Selected: R$ " +
+          Number(amount)
+            .toLocaleString("en-US");
+
+
+        reviewButton.disabled =
+          false;
+
+      }
+    );
+
+  }
+);
+
+
+/* =========================
+   STEP 3 → STEP 4
+========================= */
 
 reviewButton.addEventListener(
   "click",
   function () {
 
+    if (!amount) {
+      return;
+    }
+
+
     reviewUsername.textContent =
       username;
 
+
     reviewRecipient.textContent =
       username;
+
 
     reviewAmount.textContent =
       "R$ " +
       Number(amount)
         .toLocaleString("en-US");
 
+
     reviewAvatar.src =
       avatarUrl;
+
 
     showStep("step4");
 
   }
 );
 
+
+/* =========================
+   BACK TO RECIPIENT
+========================= */
 
 document
   .getElementById("backToRecipient")
@@ -408,7 +781,7 @@ document
 
 
 /* =========================
-   STEP 4 — REVIEW
+   BACK TO AMOUNT
 ========================= */
 
 document
@@ -433,7 +806,16 @@ document
     "click",
     function () {
 
+      if (
+        !username ||
+        !amount
+      ) {
+        return;
+      }
+
+
       showStep("step5");
+
 
       setTimeout(
         function () {
@@ -445,6 +827,7 @@ document
             " to " +
             username +
             " has been completed.";
+
 
           showStep("step6");
 
@@ -471,49 +854,77 @@ document
       userId = "";
       avatarUrl = "";
 
-      usernameInput.value = "";
 
-      results.innerHTML = "";
+      usernameInput.value =
+        "";
 
-      searchStatus.textContent = "";
+
+      results.innerHTML =
+        "";
+
+
+      searchStatus.textContent =
+        "";
+
 
       error.style.display =
         "none";
 
+
       continueButton.disabled =
         true;
+
 
       selectedUsername.textContent =
         "Username";
 
-      selectedAvatar.src = "";
+
+      selectedAvatar.src =
+        "";
+
 
       amountUsername.textContent =
         "Username";
 
-      amountAvatar.src = "";
+
+      amountAvatar.src =
+        "";
+
 
       reviewUsername.textContent =
         "Username";
 
+
       reviewRecipient.textContent =
         "";
+
 
       reviewAmount.textContent =
         "";
 
+
       reviewAvatar.src =
         "";
 
-      amountOptions.forEach(option => {
-        option.classList.remove("selected");
-      });
+
+      amountOptions.forEach(
+        option => {
+
+          option.classList.remove(
+            "selected"
+          );
+
+        }
+      );
+
 
       selectedAmount.textContent =
         "Select an amount";
 
+
       reviewButton.disabled =
         true;
+
 
       showStep("step1");
 
